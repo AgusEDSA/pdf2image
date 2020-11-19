@@ -10,7 +10,7 @@ import types
 import shutil
 import pathlib
 
-from subprocess import Popen, PIPE, TimeoutExpired
+from subprocess import Popen, PIPE, TimeoutExpired, DEVNULL
 from PIL import Image
 
 from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
@@ -186,7 +186,7 @@ def convert_from_path(
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         # Spawn the process and save its uuid
         processes.append(
-            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE))
+            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE, stdin=DEVNULL))
         )
 
     images = []
@@ -403,7 +403,7 @@ def _get_poppler_version(command, poppler_path=None, timeout=None):
     env = os.environ.copy()
     if poppler_path is not None:
         env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE, stdin=DEVNULL)
 
     try:
         data, err = proc.communicate(timeout=timeout)
@@ -438,7 +438,7 @@ def pdfinfo_from_path(
         env = os.environ.copy()
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE, stdin=DEVNULL)
 
         try:
             out, err = proc.communicate(timeout=timeout)
